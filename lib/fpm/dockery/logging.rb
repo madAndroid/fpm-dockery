@@ -1,6 +1,8 @@
 module FPM
   module Dockery
     module Logging
+
+      STDOUT.sync = true
       
       @@logger = Logger.new(STDOUT)
       @@logger.formatter = proc do |severity, datetime, progname, msg|
