@@ -36,7 +36,8 @@ module FPM
           validate_builder!
           cache_option = no_cache ? '--no-cache=true' : ''
           if dockerfile
-            dockerfile_path = File.expand_path(dockerfile)
+            FileUtils.cp(File.expand_path(dockerfile), "#{FPM::Dockery.root}/docker/Dockerfile")
+            dockerfile_path = "#{FPM::Dockery.root}/docker/Dockerfile"
           else
             dockerfile_path = "#{FPM::Dockery.root}/docker/Dockerfile.#{builder}"
           end
