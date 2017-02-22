@@ -32,10 +32,15 @@ module FPM
         end
 
         # Create a builder image.
-        def create_builder(no_cache)
+        def create_builder(no_cache, dockerfile)
           validate_builder!
           cache_option = no_cache ? '--no-cache=true' : ''
-          exit_status = Subprocess.run("docker build #{cache_option} -f #{FPM::Dockery.root}/docker/Dockerfile.#{builder} -t fpm-dockery/#{builder} #{FPM::Dockery.root}")
+          if dockerfile
+            dockerfile_path = File.expand_path(dockerfile)
+          else
+            dockerfile_path = "#{FPM::Dockery.root}/docker/Dockerfile.#{builder}"
+          end
+          exit_status = Subprocess.run("docker build #{cache_option} -f #{dockerfile_path} -t fpm-dockery/#{builder} #{FPM::Dockery.root}")
           if exit_status.exitstatus == 0
             info "Build complete"
           else
@@ -55,9 +60,10 @@ module FPM
       class CreateBuilderImage < BaseCommand
         parameter "BUILDER", "Type of builder image to build"
         option "--no-cache", :flag, "Build without cache"
+        option "--dockerfile", "DOCKERFILE", "Provide a custom Dockerfile to use"
 
         def execute
-          create_builder(no_cache?)
+          create_builder(no_cache?, dockerfile)
         end
       end
 
